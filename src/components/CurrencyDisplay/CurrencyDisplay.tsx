@@ -1,6 +1,6 @@
 import React from 'react'
 import { Popover } from 'antd';
-import { formatCurrency } from '@atila-web-components-library/utils';
+import { formatCurrency } from '@atila/web-components-library.utils';
 
 interface CurrencyDisplayPropTypes {
     amount: string | number;

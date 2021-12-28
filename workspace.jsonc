@@ -27,7 +27,7 @@
     /**
      * default scope for all components in workspace.
      **/
-    "defaultScope": "atila-web-components-library"
+    "defaultScope": "atila.web-components-library"
   },
   /**
    * main configuration for component dependency resolution.
