@@ -10,14 +10,14 @@
 
 {
     "ui/currency-display": {
-        "scope": "",
-        "version": "",
+        "scope": "atila.web-components-library",
+        "version": "0.0.1",
         "mainFile": "CurrencyDisplay.tsx",
         "rootDir": "src/components/CurrencyDisplay"
     },
     "utils": {
-        "scope": "",
-        "version": "",
+        "scope": "atila.web-components-library",
+        "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "src/services/utils"
     },
