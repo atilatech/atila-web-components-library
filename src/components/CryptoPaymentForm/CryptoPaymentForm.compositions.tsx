@@ -6,3 +6,7 @@ import 'antd/dist/antd.css';
 export const BasicCryptoPaymentForm = () => (
     <CryptoPaymentForm amount={0.01} />
 );
+
+export const EditableCryptoPaymentForm = () => (
+    <CryptoPaymentForm amount={0.01} isEditableAmount={true} isEditableDestinationAddress={true} />
+);

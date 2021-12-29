@@ -39,7 +39,7 @@ To run as a Bit server
 - `bit compile`
 - `bit start`
 
-### Export the New Component
+### Export the New Component (or updating an existing component)
 
 - tag your changes: `bit tag --all --message "add my component"`
     - Don't literally use my component, give it a descriptive message

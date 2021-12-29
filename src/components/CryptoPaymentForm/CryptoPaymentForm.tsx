@@ -15,13 +15,17 @@ export interface TransactionResponseNetwork extends ethers.providers.Transaction
 
 interface CryptoPaymentFormPropTypes {
     amount: string | number;
-    destinationAddress: string,
+    destinationAddress: string;
+    isEditableAmount: boolean;
+    isEditableDestinationAddress: boolean;
     onError: (message: string) => {};
     onSuccess: (transaction: TransactionResponseNetwork) => {};
 }
 
 CryptoPaymentForm.defaultProps = {
     destinationAddress: "0x538642a5f4554A6f42381760F0B51e4203812A82", //tomiwa1a.eth
+    isEditableAmount: false,
+    isEditableDestinationAddress: false,
     onError: (message: string) => {},
     onSuccess: (transaction: ethers.providers.TransactionResponse) => {},
 };
@@ -31,10 +35,12 @@ CryptoPaymentForm.defaultProps = {
  */
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
-    const { amount, destinationAddress, onError, onSuccess } = props;
+    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress} = props;
 
     const [error, setError] = useState("");
     const [transaction, setTransaction] = useState<TransactionResponseNetwork | null >(null);
+    const [amount, setAmount] = useState(props.amount);
+    const [destinationAddress, setDestinationAddress] = useState(props.destinationAddress)
 
     const startPayment = async (event: any ) => {
 
@@ -65,7 +71,13 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         }
       };
 
-    
+    const updatePaymentForm = (event: any) => {
+        if (event.target.name === "amount") {
+            setAmount(event.target.value);
+        } else if (event.target.name === "address") {
+            setDestinationAddress(event.target.value);
+        }
+    }
     
     let transactionUrl = "";
 
@@ -73,17 +85,40 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         transactionUrl = `https://${transaction.network?.name === "homestead" ? "": transaction.network?.name+"."}etherscan.io/tx/${transaction.hash}`
     }
 
+    // Note: This destination address does not distinguish between if the mainnet or Test (e.g. Ropsten) network is being used
+    let destinationAddressUrl = `https://etherscan.io/address/${destinationAddress}`;
+
     return (   
         <div className="m-4 shadow-lg rounded p-4">
             <h1>
                 Send ETH payment
             </h1>
+            <div className="text-left">
+            <label className="mb-2">
+                Destination Address: {destinationAddress}<br/>
+                <a href={destinationAddressUrl} target="_blank" rel="noopener noreferrer">
+                View Address
+                </a>
+             </label><br/>
+            {isEditableDestinationAddress && 
+                <>
+                <label className="mb-2">Destination Address </label>
+                <input
+                    className="form-control col-12 mb-4"
+                    name="address"
+                    value={destinationAddress}
+                    onChange={updatePaymentForm}
+                />
+                </>
+                }
                 <label className="mb-2">Payment Amount (ETH) </label>
                 <input
-                    name="ether"
-                    value={amount}
-                    disabled={true}
                     className="form-control col-12"
+                    type="number"
+                    name="amount"
+                    value={amount}
+                    disabled={!isEditableAmount}
+                    onChange={updatePaymentForm}
                 />
                 <Button
                     type="primary"
@@ -112,6 +147,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     message={error}
                 />
                 }
+            </div>
         </div>
     )
 }

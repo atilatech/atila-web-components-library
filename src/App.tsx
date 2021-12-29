@@ -9,6 +9,8 @@ function App() {
     <CurrencyDisplay amount={0.01} />
     <hr/>
     <CryptoPaymentForm amount={0.01} />
+    <hr />
+    <CryptoPaymentForm amount={0.01} isEditableAmount={true} isEditableDestinationAddress={true} />
     </div>
   );
 }
