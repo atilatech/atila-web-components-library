@@ -16,4 +16,33 @@ To run as a React web server
 To run as a Bit server
 
 - `bit install`
+
+## Adding a New Component
+
+- Summary of this tutorial: [Getting Started with Bit](https://harmony-docs.bit.dev/getting-started/)
+
+- Create a tsx folder and file for the component: `src/components/MyComponent/MyComponent.tsx`
+- Create a compositions file `src/components/MyComponent/MyComponent.compositions.tsx`
+- Make sure to import stylesheets into the compostions file
+    - Note: We're looking into a way to automatically import the stylesheets in all compositions
+
+        ```
+        import 'bootstrap/dist/css/bootstrap.css';
+        import 'antd/dist/antd.css';
+        ```
+- Add using Bit: `bit add src/components/MyComponent/ --namespace ui`
+
+- To remove: `bit remove ui/my-component`
+
+### Running the dev server with new component
+
+- `bit compile`
 - `bit start`
+
+### Export the New Component
+
+- tag your changes: `bit tag --all --message "add my component"`
+    - Don't literally use my component, give it a descriptive message
+- export: `bit export`
+- commit your changes: `git commit -am "updated .bitmap file after a successful export"`
+Go to https://bit.dev/atila/web-components-library to see your exported components.

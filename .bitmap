@@ -9,9 +9,15 @@
  */
 
 {
-    "ui/currency-display": {
+    "ui/crypto-payment-form": {
         "scope": "atila.web-components-library",
         "version": "0.0.1",
+        "mainFile": "CryptoPaymentForm.tsx",
+        "rootDir": "src/components/CryptoPaymentForm"
+    },
+    "ui/currency-display": {
+        "scope": "atila.web-components-library",
+        "version": "0.0.2",
         "mainFile": "CurrencyDisplay.tsx",
         "rootDir": "src/components/CurrencyDisplay"
     },

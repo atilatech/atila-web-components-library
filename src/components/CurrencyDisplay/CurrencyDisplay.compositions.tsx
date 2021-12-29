@@ -1,5 +1,6 @@
 import React from 'react';
 import CurrencyDisplay from './CurrencyDisplay';
+import 'bootstrap/dist/css/bootstrap.css';
 import 'antd/dist/antd.css';
 
 export const BasicCurrencyDisplay = () => (

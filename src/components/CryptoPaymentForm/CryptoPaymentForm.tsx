@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { Alert, Button } from 'antd';
 import { ethers } from 'ethers';
 
-
+// https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
+declare global {
+    interface Window {
+        ethereum:any;
+    }
+}
 
 export interface TransactionResponseNetwork extends ethers.providers.TransactionResponse {
     network?: ethers.providers.Network,
@@ -21,6 +26,9 @@ CryptoPaymentForm.defaultProps = {
     onSuccess: (transaction: ethers.providers.TransactionResponse) => {},
 };
 
+/**
+ * @desc A simple form for creating crypto payments.
+ */
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
     const { amount, destinationAddress, onError, onSuccess } = props;
@@ -33,6 +41,8 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         event.preventDefault();
 
         try {
+          // clear any existing errors from previous calls to startPayment()
+          setError("");
           if (!window.ethereum)
             throw new Error("No crypto wallet found. Please install it.");
     
@@ -63,42 +73,38 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         transactionUrl = `https://${transaction.network?.name === "homestead" ? "": transaction.network?.name+"."}etherscan.io/tx/${transaction.hash}`
     }
 
-    return (
-        <div>
-            <div className="m-4" onSubmit={startPayment}>
-            <div className="shadow-lg rounded">
-                <div className="mt-4 p-4">
-                <h1 className="r">
-                    Send ETH payment
-                </h1>
-                <div className="">
-                    <div className="my-3">
-                    <label>Payment Amount (ETH) </label>
-                    <input
-                        name="ether"
-                        value={amount}
-                        disabled={true}
-                        className="form-control col-12"
-                    />
-                    </div>
-                </div>
-                </div>
-                <div className="pb-4 px-4">
+    return (   
+        <div className="m-4 shadow-lg rounded p-4">
+            <h1>
+                Send ETH payment
+            </h1>
+                <label className="mb-2">Payment Amount (ETH) </label>
+                <input
+                    name="ether"
+                    value={amount}
+                    disabled={true}
+                    className="form-control col-12"
+                />
                 <Button
                     type="primary"
-                    className="col-12"
+                    className="col-12 my-4"
                     onClick={startPayment}
                     style={{height: '40px'}}
                 >
                     Confirm Payment of {amount} ETH
                 </Button>
+
                 {
                     transactionUrl &&
-                    <p className="my-2"> 
+                    <Alert
+                        type="success"
+                        message={<p className="my-2"> 
                         Payment Complete: <a href={transactionUrl} target="_blank" rel="noopener noreferrer">
                         View Transaction
                         </a>
-                    </p>
+                    </p>}
+                    />
+                    
                 }
                 {error && 
                 <Alert
@@ -106,9 +112,6 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     message={error}
                 />
                 }
-                </div>
-            </div>
-            </div>
         </div>
     )
 }
