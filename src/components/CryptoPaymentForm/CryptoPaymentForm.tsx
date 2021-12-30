@@ -23,7 +23,7 @@ interface CryptoPaymentFormPropTypes {
 }
 
 CryptoPaymentForm.defaultProps = {
-    destinationAddress: "0x538642a5f4554A6f42381760F0B51e4203812A82", //tomiwa1a.eth
+    destinationAddress: "0x38103603fEB199fba32be9b3A464877f28e659A7", //atilatech.eth
     isEditableAmount: false,
     isEditableDestinationAddress: false,
     onError: (message: string) => {},
