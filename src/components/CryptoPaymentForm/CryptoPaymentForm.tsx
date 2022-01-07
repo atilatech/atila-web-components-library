@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import { Alert, Button } from 'antd';
 import { ethers } from 'ethers';
 
@@ -25,6 +25,8 @@ interface CryptoPaymentFormPropTypes {
     isEditableDestinationAddress: boolean;
     onError: (message: string) => void;
     onSuccess: (transaction: TransactionResponsePayment) => void;
+    className: string;
+    style: CSSProperties;
 }
 
 CryptoPaymentForm.defaultProps = {
@@ -33,6 +35,8 @@ CryptoPaymentForm.defaultProps = {
     isEditableDestinationAddress: false,
     onError: (message: string) => {},
     onSuccess: (transaction: ethers.providers.TransactionResponse) => {},
+    className: "",
+    style: {},
 };
 
 /**
@@ -40,7 +44,7 @@ CryptoPaymentForm.defaultProps = {
  */
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
-    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress} = props;
+    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style} = props;
 
     const [error, setError] = useState("");
     const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
@@ -96,7 +100,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     let destinationAddressUrl = `https://etherscan.io/address/${destinationAddress}`;
 
     return (   
-        <div className="m-4 shadow-lg rounded p-4">
+        <div className={`${className} m-4 shadow-lg rounded p-4`} style={style}>
             <h1>
                 Send ETH payment
             </h1>
