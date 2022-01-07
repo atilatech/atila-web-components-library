@@ -46,5 +46,5 @@ To run as a Bit server
 - If you want to tag all modified components: `bit tag --all --message "add my component"`
     - Don't literally use my component, give it a descriptive message
 - export: `bit export`
-- commit your changes: `git commit -am "updated .bitmap file after a successful export"`
+- commit your changes: `git commit -am "updated .bitmap file to new version"`
 Go to https://bit.dev/atila/web-components-library to see your exported components.
