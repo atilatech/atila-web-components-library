@@ -9,17 +9,22 @@ declare global {
     }
 }
 
-export interface TransactionResponseNetwork extends ethers.providers.TransactionResponse {
+export interface TransactionResponsePayment extends ethers.providers.TransactionResponse {
     network?: ethers.providers.Network,
+    sourceAddress: string;
+    destinationAddress: string;
+    destinationAmount: number|string;
 }
 
 interface CryptoPaymentFormPropTypes {
+    /** Amount to send to destination address before gas fees. */
     amount: string | number;
     destinationAddress: string;
+    /** Controls if the amount can be edited. */
     isEditableAmount: boolean;
     isEditableDestinationAddress: boolean;
-    onError: (message: string) => {};
-    onSuccess: (transaction: TransactionResponseNetwork) => {};
+    onError: (message: string) => void;
+    onSuccess: (transaction: TransactionResponsePayment) => void;
 }
 
 CryptoPaymentForm.defaultProps = {
@@ -38,7 +43,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress} = props;
 
     const [error, setError] = useState("");
-    const [transaction, setTransaction] = useState<TransactionResponseNetwork | null >(null);
+    const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
     const [amount, setAmount] = useState(props.amount);
     const [destinationAddress, setDestinationAddress] = useState(props.destinationAddress)
 
@@ -49,8 +54,9 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         try {
           // clear any existing errors from previous calls to startPayment()
           setError("");
-          if (!window.ethereum)
+          if (!window.ethereum) {
             throw new Error("No crypto wallet found. Please install it.");
+          }
     
           await window.ethereum.send("eth_requestAccounts");
           const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -60,8 +66,9 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
           const transactionResponse = await signer.sendTransaction({
             to: destinationAddress,
             value: ethers.utils.parseEther(amount.toString())
-          }) as TransactionResponseNetwork;
+          }) as TransactionResponsePayment;
           transactionResponse.network = network;
+          transactionResponse.destinationAmount = amount.toString();
           setTransaction(transactionResponse)
           onSuccess(transactionResponse);
 
