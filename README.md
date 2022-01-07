@@ -19,7 +19,7 @@ To run as a Bit server
 
 ## Adding a New Component
 
-- Summary of this tutorial: [Getting Started with Bit](https://harmony-docs.bit.dev/getting-started/)
+- Summary of this tutorial: [Getting Started with Bit](https://harmony-docs.bit.dev/getting-started/creating-components)
 
 - Create a tsx folder and file for the component: `src/components/MyComponent/MyComponent.tsx`
 - Create a compositions file `src/components/MyComponent/MyComponent.compositions.tsx`
@@ -41,7 +41,9 @@ To run as a Bit server
 
 ### Export the New Component (or updating an existing component)
 
-- tag your changes: `bit tag --all --message "add my component"`
+- Tag the component you changed: `bit tag <component_id> --patch --message "first version"`
+    - Use `bit list` to find your component ID
+- If you want to tag all modified components: `bit tag --all --message "add my component"`
     - Don't literally use my component, give it a descriptive message
 - export: `bit export`
 - commit your changes: `git commit -am "updated .bitmap file after a successful export"`
