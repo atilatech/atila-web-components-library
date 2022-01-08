@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { Alert, Button } from 'antd';
 import { ethers } from 'ethers';
 
@@ -6,6 +6,24 @@ import { ethers } from 'ethers';
 declare global {
     interface Window {
         ethereum:any;
+    }
+}
+
+export const CHAIN_IDS =  {
+    BINANCE: {
+        NAME: "Binance",
+        CURRENCY_CODE: "BNB",
+        RPC_PROVIDER_URL: "https://bsc-dataseed.binance.org/",
+        MAIN_NET: {
+            ID: 1
+        },
+    },
+    ETHEREUM: {
+        NAME: "Ethereum",
+        CURRENCY_CODE: "ETH",
+        MAIN_NET: {
+            ID: 1
+        }
     }
 }
 
@@ -20,9 +38,12 @@ interface CryptoPaymentFormPropTypes {
     /** Amount to send to destination address before gas fees. */
     amount: string | number;
     destinationAddress: string;
+    chainId: number;
+    title: string;
+    currency: string;
     /** Controls if the amount can be edited. */
     isEditableAmount: boolean;
-    isEditableDestinationAddress: boolean;
+    isEditableDestinationAddress?: boolean;
     onError: (message: string) => void;
     onSuccess: (transaction: TransactionResponsePayment) => void;
     className: string;
@@ -31,6 +52,9 @@ interface CryptoPaymentFormPropTypes {
 
 CryptoPaymentForm.defaultProps = {
     destinationAddress: "0x38103603fEB199fba32be9b3A464877f28e659A7", //atilatech.eth
+    chainId: CHAIN_IDS.ETHEREUM.MAIN_NET.ID,
+    title: "",
+    currency: "ETH",
     isEditableAmount: false,
     isEditableDestinationAddress: false,
     onError: (message: string) => {},
@@ -44,12 +68,17 @@ CryptoPaymentForm.defaultProps = {
  */
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
-    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style} = props;
+    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style, chainId, title, currency} = props;
 
     const [error, setError] = useState("");
     const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
     const [amount, setAmount] = useState(props.amount);
-    const [destinationAddress, setDestinationAddress] = useState(props.destinationAddress)
+    const [destinationAddress, setDestinationAddress] = useState(props.destinationAddress);
+
+    useEffect(() => {
+        setAmount(props.amount);
+        setDestinationAddress(props.destinationAddress);
+      }, [props.amount, props.destinationAddress]);
 
     const startPayment = async (event: any ) => {
 
@@ -63,9 +92,16 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
           }
     
           await window.ethereum.send("eth_requestAccounts");
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          let provider;
+
+          if( chainId === CHAIN_IDS.BINANCE.MAIN_NET.ID ) {
+            provider = new ethers.providers.JsonRpcProvider(CHAIN_IDS.BINANCE.RPC_PROVIDER_URL)
+          } else {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+          }
           const signer = provider.getSigner();
-          const network = await provider.getNetwork()
+          const network = await provider.getNetwork();
+
           ethers.utils.getAddress(destinationAddress);
           const transactionResponse = await signer.sendTransaction({
             to: destinationAddress,
@@ -73,6 +109,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
           }) as TransactionResponsePayment;
           transactionResponse.network = network;
           transactionResponse.destinationAmount = amount.toString();
+
           setTransaction(transactionResponse)
           onSuccess(transactionResponse);
 
@@ -92,18 +129,26 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     
     let transactionUrl = "";
 
+    let blockExplorerHost = "etherscan.io";
+
+    if (chainId === CHAIN_IDS.BINANCE.MAIN_NET.ID) {
+        blockExplorerHost = "bscscan.io"
+    }
+
     if (transaction?.hash) {
-        transactionUrl = `https://${transaction.network?.name === "homestead" ? "": transaction.network?.name+"."}etherscan.io/tx/${transaction.hash}`
+        transactionUrl = `https://${transaction.network?.name === "homestead" ? "": transaction.network?.name+"."}${blockExplorerHost}/tx/${transaction.hash}`
     }
 
     // Note: This destination address does not distinguish between if the mainnet or Test (e.g. Ropsten) network is being used
-    let destinationAddressUrl = `https://etherscan.io/address/${destinationAddress}`;
+    let destinationAddressUrl = `https://${blockExplorerHost}/address/${destinationAddress}`;
 
     return (   
         <div className={`${className} m-4 shadow-lg rounded p-4`} style={style}>
-            <h1>
-                Send ETH payment
-            </h1>
+            {title && 
+                <h1>
+                    {title}
+                </h1>
+            }
             <div className="text-left">
             <label className="mb-2">
                 Destination Address: {destinationAddress}<br/>
@@ -122,7 +167,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                 />
                 </>
                 }
-                <label className="mb-2">Payment Amount (ETH) </label>
+                <label className="mb-2">Payment Amount ({currency}) </label>
                 <input
                     className="form-control col-12"
                     type="number"
@@ -137,7 +182,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     onClick={startPayment}
                     style={{height: '40px'}}
                 >
-                    Confirm Payment of {amount} ETH
+                    Confirm Payment of {Number.parseFloat(amount as string).toFixed(6)} {currency}
                 </Button>
 
                 {
