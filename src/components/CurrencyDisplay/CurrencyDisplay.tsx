@@ -12,19 +12,19 @@ interface CurrencyDisplayPropTypes {
 const CURRENCIES = {
     CAD: {
         label: "Canadian Dollar",
-        ETH: 5146.82
+        ETH: 4137.00
     },
     USD: {
         label: "United States Dollar",
-        ETH: 3945.76
+        ETH: 3251.11
     },
     INR: {
         label: "Indian Rupee",
-        ETH: 301317.73,
+        ETH: 241681.83,
     },
     NGN: {
         label: "Nigerian Naira",
-        ETH: 1654520.77,
+        ETH: 1338789.00,
     }
 }
 
@@ -45,6 +45,8 @@ function CurrencyDisplay(props: CurrencyDisplayPropTypes) {
             {Object.keys(currencies).map(currencyCode => <p key={currencyCode}> 
                 {currencies[currencyCode].label}: {formatCurrency((amount as number) * currencies[currencyCode][inputCurrency], currencyCode)}
             </p>)}
+            <small>Note: These currencies are not updated in realtime.<br/>
+             Doublecheck amounts with a secondary source.</small>
         </div>
       );
 
