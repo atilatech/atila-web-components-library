@@ -35,6 +35,8 @@ export const CHAIN_IDS =  {
     }
 }
 
+export const MAXIMUM_DECIMAL_PLACES = 8;
+
 export interface TransactionResponsePayment extends ethers.providers.TransactionResponse {
     network?: ethers.providers.Network,
     sourceAddress: string;
@@ -44,7 +46,7 @@ export interface TransactionResponsePayment extends ethers.providers.Transaction
 
 interface CryptoPaymentFormPropTypes {
     /** Amount to send to destination address before gas fees. */
-    amount: string | number;
+    amount: number;
     destinationAddress: string;
     isTestNet: boolean;
     networkName: string;
@@ -78,13 +80,14 @@ CryptoPaymentForm.defaultProps = {
  */
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
-    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style, title, currency, isTestNet} = props;
+    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style, title, currency } = props;
     let { networkName } = props;
 
     const [error, setError] = useState("");
     const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
     const [amount, setAmount] = useState(props.amount);
     const [destinationAddress, setDestinationAddress] = useState(props.destinationAddress);
+    const [isTestNet, setIsTestNet] = useState(props.isTestNet)
 
     
 
@@ -105,6 +108,12 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     // Note: This destination address does not distinguish between if the mainnet or Test (e.g. Ropsten) network is being used
     let destinationAddressUrl = `https://${blockExplorerHost}/address/${destinationAddress}`;
 
+    /**
+     * Check that the selected network in the browser matches the network in the user's settings.
+     * TODO: Make this code simpler.
+     * @param network 
+     * @returns 
+     */
     const checkCorrectNetwork = (network: Network) => {
         let expectedChainId;
 
@@ -127,8 +136,8 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         if (network.chainId !== expectedChainId) {
             const actualNetworkName = [CHAIN_IDS.BINANCE.TEST_NET.ID, CHAIN_IDS.ETHEREUM.ROPSTEN.ID].includes(network.chainId) ? "testnet" : "mainnet";
             const actualCurrency = [CHAIN_IDS.BINANCE.MAIN_NET.ID, CHAIN_IDS.BINANCE.TEST_NET.ID].includes(network.chainId)? CHAIN_IDS.BINANCE.CURRENCY_CODE : CHAIN_IDS.ETHEREUM.CURRENCY_CODE;
-            return {isCorrectNetwork: false, message: `Change your network in metamask. Expected network "${networkName}" for currency: ${currency}.
-             Instead received "${actualNetworkName}" network for currency: ${actualCurrency}.`}
+            return {isCorrectNetwork: false, message: `Change your network in Metamask. Expected "${isTestNet ? "testnet" : "mainnet"}" network (${networkName}) for currency: ${currency}.
+             Instead received "${actualNetworkName}" network (${network.name}) for currency: ${actualCurrency}.`}
         }
         return { isCorrectNetwork: true, message: "" }
     }
@@ -136,7 +145,8 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     useEffect(() => {
         setAmount(props.amount);
         setDestinationAddress(props.destinationAddress);
-      }, [props.amount, props.destinationAddress]);
+        setIsTestNet(props.isTestNet);
+      }, [props.amount, props.destinationAddress, props.isTestNet]);
 
     const startPayment = async (event: any ) => {
 
@@ -164,7 +174,11 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
           ethers.utils.getAddress(destinationAddress);
           const transactionResponse = await signer.sendTransaction({
             to: destinationAddress,
-            value: ethers.utils.parseEther(amount.toString())
+            // Sometimes when performing float division we might get a number with some decimal places that is less than 1 wei (1e-18)
+            // Which was causing this error: 
+            // fractional component exceeds decimals (fault="underflow", operation="parseFixed", code=NUMERIC_FAULT, version=bignumber/5.5.0)
+            // So we need to fix the number of decimal places to MAXIMUM_DECIMAL_PLACES https://github.com/ethers-io/ethers.js/issues/648 to prevent an underflow
+            value: ethers.utils.parseEther(amount.toFixed(MAXIMUM_DECIMAL_PLACES).toString())
           }) as TransactionResponsePayment;
           transactionResponse.network = network;
           transactionResponse.destinationAmount = amount.toString();
@@ -188,7 +202,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     }
 
     return (   
-        <div className={`${className} m-4 shadow-lg rounded p-4`} style={style}>
+        <div className={`${className} shadow-lg rounded p-4`} style={style}>
             {title && 
                 <h1>
                     {title}
@@ -227,7 +241,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     onClick={startPayment}
                     style={{height: '40px'}}
                 >
-                    Confirm Payment of {Number.parseFloat(amount as string).toFixed(6)} {currency}
+                    Confirm Payment of {amount.toFixed(MAXIMUM_DECIMAL_PLACES)} {currency}
                 </Button>
 
                 {

@@ -27,6 +27,15 @@ const currencyOptions = [
     }
 ]
 
+const networkOptions = [
+    {
+        value: "testnet",
+    },
+    {
+        value: "mainnet",
+    }
+]
+
 export const BasicCryptoPaymentForm = () => (
     <CryptoPaymentForm amount={0.01} />
 );
@@ -38,7 +47,8 @@ export const EditableCryptoPaymentForm = () => (
 export const ConfigurableCryptoPaymentForm = () => {
 
     const [paymentAmount, setPaymentAmount] = useState(0);
-    const [currency, setCurrency] = useState(currencyOptions[0].value)
+    const [currency, setCurrency] = useState(currencyOptions[0].value);
+    const [network, setNetwork] = useState(networkOptions[0].value)
 
     const currencyExchangeRates: any = {
         ETH: 3808.87,
@@ -55,7 +65,7 @@ export const ConfigurableCryptoPaymentForm = () => {
 
     const selectAmount = (
       <>
-      <Select value={paymentAmount} onChange={handleAmountChange} style={{width: "250px"}}>
+      <Select value={paymentAmount} onChange={handleAmountChange} style={{width: "250px"}} className="mb-3">
           <Option value={0} disabled={true}>{"Select Amount"}</Option>
           {paymentAmountOptions.map(paymentAmountOption => (
               <Option key={paymentAmountOption} value={paymentAmountOption}>{paymentAmountOption.toLocaleString('en-ca', {style : 'currency', currency: "CAD" })}{' '}
@@ -70,10 +80,16 @@ export const ConfigurableCryptoPaymentForm = () => {
             {currencyOptions.map(currencyOption => (<Radio.Button key={currencyOption.value} value={currencyOption.value}>{currencyOption.name}</Radio.Button>))}
       </Radio.Group>
     )
+    const selectNetwork = (
+        <Radio.Group value={network} onChange={event => setNetwork(event.target.value)} optionType="button" buttonStyle="solid" className="mb-3">
+            {networkOptions.map(currencyOption => (<Radio.Button key={currencyOption.value} value={currencyOption.value}>{currencyOption.value}</Radio.Button>))}
+      </Radio.Group>
+    )
     return (
     <>
     {selectCurrency}<br/>
+    {selectNetwork}<br/>
     {selectAmount}
-    <CryptoPaymentForm amount={paymentAmount/currencyExchangeRates[currency]} currency={currency} />
+    <CryptoPaymentForm amount={paymentAmount/currencyExchangeRates[currency]} currency={currency} isTestNet={network === "testnet"} />
     </>)
 };

@@ -10,7 +10,7 @@ function App() {
     console.log(transaction);
   }
   return (
-    <div className="App">
+    <div className="App container py-5">
     <CurrencyDisplay amount={0.01} />
     <hr/>
     <ConfigurableCryptoPaymentForm />
