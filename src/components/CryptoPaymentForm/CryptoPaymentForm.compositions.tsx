@@ -82,7 +82,8 @@ export const ConfigurableCryptoPaymentForm = () => {
     {selectCurrency}<br/>
     {selectNetwork}<br/>
     {selectAmount}
-    <CryptoPaymentForm amount={paymentAmount/currencyExchangeRates[currency]} currency={currency} isTestNet={network === "testnet"} />
+    <CryptoPaymentForm amount={paymentAmount/currencyExchangeRates[currency]} 
+    currency={currency} isTestNet={network === "testnet"} isEditableDestinationAddress={true} />
     </>)
 };
 
