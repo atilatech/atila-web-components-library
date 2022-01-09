@@ -11,7 +11,7 @@
 {
     "ui/crypto-payment-form": {
         "scope": "atila.web-components-library",
-        "version": "0.0.3",
+        "version": "0.0.4",
         "mainFile": "CryptoPaymentForm.tsx",
         "rootDir": "src/components/CryptoPaymentForm"
     },
