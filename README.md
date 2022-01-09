@@ -43,6 +43,7 @@ To run as a Bit server
 
 - Tag the component you changed: `bit tag <component_id> --patch --message "first version"`
     - Use `bit list` to find your component ID
+    - Example: `bit tag atila.web-components-library/ui/crypto-payment-form --patch --message "added support for binance and testnets"`
 - If you want to tag all modified components: `bit tag --all --message "add my component"`
     - Don't literally use my component, give it a descriptive message
 - export: `bit export`

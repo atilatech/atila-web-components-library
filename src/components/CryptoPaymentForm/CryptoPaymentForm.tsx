@@ -130,8 +130,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
             } else {
                 expectedChainId = CHAIN_IDS.BINANCE.MAIN_NET.ID;
             }
-        } 
-        console.log({ network, expectedChainId});
+        }
 
         if (network.chainId !== expectedChainId) {
             const actualNetworkName = [CHAIN_IDS.BINANCE.TEST_NET.ID, CHAIN_IDS.ETHEREUM.ROPSTEN.ID].includes(network.chainId) ? "testnet" : "mainnet";

@@ -36,14 +36,6 @@ const networkOptions = [
     }
 ]
 
-export const BasicCryptoPaymentForm = () => (
-    <CryptoPaymentForm amount={0.01} />
-);
-
-export const EditableCryptoPaymentForm = () => (
-    <CryptoPaymentForm amount={0.01} isEditableAmount={true} isEditableDestinationAddress={true} />
-);
-
 export const ConfigurableCryptoPaymentForm = () => {
 
     const [paymentAmount, setPaymentAmount] = useState(0);
@@ -93,3 +85,7 @@ export const ConfigurableCryptoPaymentForm = () => {
     <CryptoPaymentForm amount={paymentAmount/currencyExchangeRates[currency]} currency={currency} isTestNet={network === "testnet"} />
     </>)
 };
+
+export const EditableCryptoPaymentForm = () => (
+    <CryptoPaymentForm amount={0.01} isEditableAmount={true} isEditableDestinationAddress={true} />
+);
