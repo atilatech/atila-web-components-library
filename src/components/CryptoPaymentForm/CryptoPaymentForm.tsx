@@ -1,6 +1,7 @@
 import React, { CSSProperties, useEffect, useState } from 'react';
 import { Alert, Button } from 'antd';
 import { ethers } from 'ethers';
+import { Network } from '@ethersproject/networks';
 
 // https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
 declare global {
@@ -18,7 +19,7 @@ export const CHAIN_IDS =  {
         },
         TEST_NET: {
             NAME: "testnet",
-            ID: "97",
+            ID: 97,
         }
     },
     ETHEREUM: {
@@ -46,7 +47,7 @@ interface CryptoPaymentFormPropTypes {
     amount: string | number;
     destinationAddress: string;
     isTestNet: boolean;
-    testNetName: string;
+    networkName: string;
     title: string;
     currency: string;
     /** Controls if the amount can be edited. */
@@ -59,9 +60,9 @@ interface CryptoPaymentFormPropTypes {
 }
 
 CryptoPaymentForm.defaultProps = {
-    destinationAddress: "0x38103603fEB199fba32be9b3A464877f28e659A7", //atilatech.eth]
+    destinationAddress: "0x38103603fEB199fba32be9b3A464877f28e659A7", //atilatech.eth
     isTestNet: true,
-    testNetName: null,
+    networkName: "",
     title: "",
     currency: "ETH",
     isEditableAmount: false,
@@ -78,13 +79,60 @@ CryptoPaymentForm.defaultProps = {
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
     const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style, title, currency, isTestNet} = props;
-    let { testNetName } = props;
+    let { networkName } = props;
 
     const [error, setError] = useState("");
     const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
     const [amount, setAmount] = useState(props.amount);
     const [destinationAddress, setDestinationAddress] = useState(props.destinationAddress);
 
+    
+
+    let blockExplorerHost = "etherscan.io";
+
+    if (currency === CHAIN_IDS.BINANCE.CURRENCY_CODE) {
+        blockExplorerHost = "bscscan.com"
+    }
+    if (isTestNet) {
+        networkName = currency === CHAIN_IDS.BINANCE.CURRENCY_CODE ? CHAIN_IDS.BINANCE.TEST_NET.NAME : CHAIN_IDS.ETHEREUM.ROPSTEN.NAME;
+        blockExplorerHost = `${networkName}.${blockExplorerHost}`
+    } else {
+        networkName = "mainnet"
+    }
+
+    const transactionUrl = transaction?.hash ? `https://${blockExplorerHost}/tx/${transaction.hash}` : "";
+
+    // Note: This destination address does not distinguish between if the mainnet or Test (e.g. Ropsten) network is being used
+    let destinationAddressUrl = `https://${blockExplorerHost}/address/${destinationAddress}`;
+
+    const checkCorrectNetwork = (network: Network) => {
+        let expectedChainId;
+
+        if (currency === CHAIN_IDS.ETHEREUM.CURRENCY_CODE) {
+            if (isTestNet) {
+                expectedChainId = CHAIN_IDS.ETHEREUM.ROPSTEN.ID;
+            } else {
+                expectedChainId = CHAIN_IDS.ETHEREUM.MAIN_NET.ID;
+
+            }
+        } else if (currency === CHAIN_IDS.BINANCE.CURRENCY_CODE) {
+            if (isTestNet) {
+                expectedChainId = CHAIN_IDS.BINANCE.TEST_NET.ID;
+            } else {
+                expectedChainId = CHAIN_IDS.BINANCE.MAIN_NET.ID;
+            }
+        } 
+        console.log({ network, expectedChainId});
+
+        if (network.chainId !== expectedChainId) {
+            const actualNetworkName = [CHAIN_IDS.BINANCE.TEST_NET.ID, CHAIN_IDS.ETHEREUM.ROPSTEN.ID].includes(network.chainId) ? "testnet" : "mainnet";
+            const actualCurrency = [CHAIN_IDS.BINANCE.MAIN_NET.ID, CHAIN_IDS.BINANCE.TEST_NET.ID].includes(network.chainId)? CHAIN_IDS.BINANCE.CURRENCY_CODE : CHAIN_IDS.ETHEREUM.CURRENCY_CODE;
+            return {isCorrectNetwork: false, message: `Change your network in metamask. Expected network "${networkName}" for currency: ${currency}.
+             Instead received "${actualNetworkName}" network for currency: ${actualCurrency}.`}
+        }
+        return { isCorrectNetwork: true, message: "" }
+    }
+    
     useEffect(() => {
         setAmount(props.amount);
         setDestinationAddress(props.destinationAddress);
@@ -106,6 +154,12 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
           const signer = provider.getSigner();
           const network = await provider.getNetwork();
+
+          const { isCorrectNetwork, message } = checkCorrectNetwork(network);
+
+          if (!isCorrectNetwork) {
+              throw new Error(message)
+          }
 
           ethers.utils.getAddress(destinationAddress);
           const transactionResponse = await signer.sendTransaction({
@@ -132,25 +186,6 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
             setDestinationAddress(event.target.value);
         }
     }
-    
-    let transactionUrl = "";
-
-    let blockExplorerHost = "etherscan.io";
-
-    if (currency === CHAIN_IDS.BINANCE.CURRENCY_CODE) {
-        blockExplorerHost = "bscscan.com"
-    }
-    if (isTestNet) {
-        testNetName = testNetName || currency === CHAIN_IDS.BINANCE.CURRENCY_CODE ? CHAIN_IDS.BINANCE.TEST_NET.NAME : CHAIN_IDS.ETHEREUM.ROPSTEN.NAME;
-        blockExplorerHost = `${testNetName}.${blockExplorerHost}`
-    }
-
-    if (transaction?.hash) {
-        transactionUrl = `https://${blockExplorerHost}/tx/${transaction.hash}`
-    }
-
-    // Note: This destination address does not distinguish between if the mainnet or Test (e.g. Ropsten) network is being used
-    let destinationAddressUrl = `https://${blockExplorerHost}/address/${destinationAddress}`;
 
     return (   
         <div className={`${className} m-4 shadow-lg rounded p-4`} style={style}>
