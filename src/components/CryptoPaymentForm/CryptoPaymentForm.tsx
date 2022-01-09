@@ -13,16 +13,23 @@ export const CHAIN_IDS =  {
     BINANCE: {
         NAME: "Binance",
         CURRENCY_CODE: "BNB",
-        RPC_PROVIDER_URL: "https://bsc-dataseed.binance.org/",
         MAIN_NET: {
-            ID: 1
+            ID: 56
         },
+        TEST_NET: {
+            NAME: "testnet",
+            ID: "97",
+        }
     },
     ETHEREUM: {
         NAME: "Ethereum",
         CURRENCY_CODE: "ETH",
         MAIN_NET: {
             ID: 1
+        },
+        ROPSTEN: {
+            NAME: "ropsten",
+            ID: 3
         }
     }
 }
@@ -38,7 +45,8 @@ interface CryptoPaymentFormPropTypes {
     /** Amount to send to destination address before gas fees. */
     amount: string | number;
     destinationAddress: string;
-    chainId: number;
+    isTestNet: boolean;
+    testNetName: string;
     title: string;
     currency: string;
     /** Controls if the amount can be edited. */
@@ -51,8 +59,9 @@ interface CryptoPaymentFormPropTypes {
 }
 
 CryptoPaymentForm.defaultProps = {
-    destinationAddress: "0x38103603fEB199fba32be9b3A464877f28e659A7", //atilatech.eth
-    chainId: CHAIN_IDS.ETHEREUM.MAIN_NET.ID,
+    destinationAddress: "0x38103603fEB199fba32be9b3A464877f28e659A7", //atilatech.eth]
+    isTestNet: true,
+    testNetName: null,
     title: "",
     currency: "ETH",
     isEditableAmount: false,
@@ -68,7 +77,8 @@ CryptoPaymentForm.defaultProps = {
  */
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
-    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style, chainId, title, currency} = props;
+    const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style, title, currency, isTestNet} = props;
+    let { testNetName } = props;
 
     const [error, setError] = useState("");
     const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
@@ -92,13 +102,8 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
           }
     
           await window.ethereum.send("eth_requestAccounts");
-          let provider;
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-          if( chainId === CHAIN_IDS.BINANCE.MAIN_NET.ID ) {
-            provider = new ethers.providers.JsonRpcProvider(CHAIN_IDS.BINANCE.RPC_PROVIDER_URL)
-          } else {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-          }
           const signer = provider.getSigner();
           const network = await provider.getNetwork();
 
@@ -116,6 +121,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         } catch (err: any) {
           setError(err.message);
           onError(err.message);
+          console.log({error});
         }
       };
 
@@ -131,12 +137,16 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
     let blockExplorerHost = "etherscan.io";
 
-    if (chainId === CHAIN_IDS.BINANCE.MAIN_NET.ID) {
-        blockExplorerHost = "bscscan.io"
+    if (currency === CHAIN_IDS.BINANCE.CURRENCY_CODE) {
+        blockExplorerHost = "bscscan.com"
+    }
+    if (isTestNet) {
+        testNetName = testNetName || currency === CHAIN_IDS.BINANCE.CURRENCY_CODE ? CHAIN_IDS.BINANCE.TEST_NET.NAME : CHAIN_IDS.ETHEREUM.ROPSTEN.NAME;
+        blockExplorerHost = `${testNetName}.${blockExplorerHost}`
     }
 
     if (transaction?.hash) {
-        transactionUrl = `https://${transaction.network?.name === "homestead" ? "": transaction.network?.name+"."}${blockExplorerHost}/tx/${transaction.hash}`
+        transactionUrl = `https://${blockExplorerHost}/tx/${transaction.hash}`
     }
 
     // Note: This destination address does not distinguish between if the mainnet or Test (e.g. Ropsten) network is being used

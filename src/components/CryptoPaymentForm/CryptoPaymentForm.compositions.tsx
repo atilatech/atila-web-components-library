@@ -44,14 +44,12 @@ export const ConfigurableCryptoPaymentForm = () => {
         ETH: 3808.87,
         BNB: 550.38,
     }
-    console.log("currencyExchangeRates[currency]", currencyExchangeRates[currency], {currencyExchangeRates, currency, currencyOptions})
 
     const handleAmountChange = (value: any) => {
       setPaymentAmount(value);
     }
 
     const handleCurrencyChange = (event: any) => {
-        console.log({currency});
         setCurrency(event.target.value);
     }
 
