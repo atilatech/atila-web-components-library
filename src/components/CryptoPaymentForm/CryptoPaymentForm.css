@@ -1,0 +1,7 @@
+.CryptoPaymentForm label {
+    overflow-wrap: anywhere;
+}
+
+.CryptoPaymentForm button {
+    height: fit-content;
+}
