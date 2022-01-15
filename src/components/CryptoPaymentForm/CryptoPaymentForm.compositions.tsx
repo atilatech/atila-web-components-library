@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CryptoPaymentForm, { CHAIN_IDS } from './CryptoPaymentForm';
+import CryptoPaymentForm, { CHAIN_IDS, CRYPTO_IN_USD, MAXIMUM_DECIMAL_PLACES } from './CryptoPaymentForm';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'antd/dist/antd.css';
 import { Radio, Select } from 'antd';
@@ -42,11 +42,6 @@ export const ConfigurableCryptoPaymentForm = () => {
     const [currency, setCurrency] = useState(currencyOptions[0].value);
     const [network, setNetwork] = useState(networkOptions[0].value)
 
-    const currencyExchangeRates: any = {
-        ETH: 3808.87,
-        BNB: 550.38,
-    }
-
     const handleAmountChange = (value: any) => {
       setPaymentAmount(value);
     }
@@ -61,7 +56,7 @@ export const ConfigurableCryptoPaymentForm = () => {
           <Option value={0} disabled={true}>{"Select Amount"}</Option>
           {paymentAmountOptions.map(paymentAmountOption => (
               <Option key={paymentAmountOption} value={paymentAmountOption}>{paymentAmountOption.toLocaleString('en-ca', {style : 'currency', currency: "CAD" })}{' '}
-               ({currency} {(paymentAmountOption/currencyExchangeRates[currency]).toFixed(6)})
+               ({currency} {(paymentAmountOption/CRYPTO_IN_USD[currency]).toFixed(MAXIMUM_DECIMAL_PLACES)})
                </Option>
           ))}
       </Select>
@@ -82,7 +77,7 @@ export const ConfigurableCryptoPaymentForm = () => {
     {selectCurrency}<br/>
     {selectNetwork}<br/>
     {selectAmount}
-    <CryptoPaymentForm amount={paymentAmount/currencyExchangeRates[currency]} 
+    <CryptoPaymentForm amount={paymentAmount/CRYPTO_IN_USD[currency]} 
     currency={currency} isTestNet={network === "testnet"} isEditableDestinationAddress={true} />
     </>)
 };

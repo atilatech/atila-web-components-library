@@ -2,6 +2,7 @@ import React, { CSSProperties, useEffect, useState } from 'react';
 import { Alert, Button } from 'antd';
 import { ethers } from 'ethers';
 import { Network } from '@ethersproject/networks';
+import "./CryptoPaymentForm.css";
 
 // https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
 declare global {
@@ -36,6 +37,11 @@ export const CHAIN_IDS =  {
 }
 
 export const MAXIMUM_DECIMAL_PLACES = 8;
+
+export const CRYPTO_IN_USD: any = {
+    ETH: 3363.92,
+    BNB: 499.98,
+}
 
 export interface TransactionResponsePayment extends ethers.providers.TransactionResponse {
     network?: ethers.providers.Network,
@@ -201,7 +207,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     }
 
     return (   
-        <div className={`${className} shadow-lg rounded p-4`} style={style}>
+        <div className={`CryptoPaymentForm ${className} shadow-lg rounded p-4`} style={style}>
             {title && 
                 <h1>
                     {title}
@@ -230,7 +236,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     className="form-control col-12"
                     type="number"
                     name="amount"
-                    value={amount}
+                    value={amount.toFixed(MAXIMUM_DECIMAL_PLACES)}
                     disabled={!isEditableAmount}
                     onChange={updatePaymentForm}
                 />
@@ -238,9 +244,9 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     type="primary"
                     className="col-12 my-4"
                     onClick={startPayment}
-                    style={{height: '40px'}}
                 >
-                    Confirm Payment of {amount.toFixed(MAXIMUM_DECIMAL_PLACES)} {currency}
+                    Confirm Payment <br/>
+                    {amount.toFixed(MAXIMUM_DECIMAL_PLACES)} {currency}
                 </Button>
 
                 {
