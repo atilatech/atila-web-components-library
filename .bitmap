@@ -9,6 +9,12 @@
  */
 
 {
+    "models/currency": {
+        "scope": "",
+        "version": "",
+        "mainFile": "index.ts",
+        "rootDir": "src/models/Currency"
+    },
     "ui/crypto-payment-form": {
         "scope": "atila.web-components-library",
         "version": "0.0.5",

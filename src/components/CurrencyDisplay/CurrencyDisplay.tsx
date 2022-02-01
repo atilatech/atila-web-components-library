@@ -1,37 +1,19 @@
 import React from 'react'
 import { Popover } from 'antd';
-import { formatCurrency } from '@atila/web-components-library.utils';
+import { convertCurrency } from '@atila/web-components-library.utils';
+import { Currencies, Currency, ETH, USD } from '@atila/web-components-library.models.currency';
 
 interface CurrencyDisplayPropTypes {
     amount: string | number;
     inputCurrency: string;
     outputCurrency: string;
-    currencies: any
+    currencies: {[key: string]: Currency}
 };
 
-const CURRENCIES = {
-    CAD: {
-        label: "Canadian Dollar",
-        ETH: 4137.00
-    },
-    USD: {
-        label: "United States Dollar",
-        ETH: 3251.11
-    },
-    INR: {
-        label: "Indian Rupee",
-        ETH: 241681.83,
-    },
-    NGN: {
-        label: "Nigerian Naira",
-        ETH: 1338789.00,
-    }
-}
-
 CurrencyDisplay.defaultProps = {
-    inputCurrency: "ETH",
-    outputCurrency: "CAD",
-    currencies: CURRENCIES,
+    inputCurrency: ETH.code,
+    outputCurrency: USD.code,
+    currencies: Currencies,
 }
 
 /**
@@ -42,8 +24,8 @@ function CurrencyDisplay(props: CurrencyDisplayPropTypes) {
     const { amount, inputCurrency, currencies, outputCurrency } = props;
     const content = (
         <div>
-            {Object.keys(currencies).map(currencyCode => <p key={currencyCode}> 
-                {currencies[currencyCode].label}: {formatCurrency((amount as number) * currencies[currencyCode][inputCurrency], currencyCode)}
+            {Object.entries(currencies).map(([currencyCode, currency]) => <p key={currencyCode}> 
+                {currency.label}: {convertCurrency(amount as number, inputCurrency, currencyCode, true)}
             </p>)}
             <small>Note: These currencies are not updated in realtime.<br/>
              Doublecheck amounts with a secondary source.</small>
@@ -55,7 +37,7 @@ function CurrencyDisplay(props: CurrencyDisplayPropTypes) {
             <Popover content={content} title="Currencies">
             {inputCurrency}{" "}{amount}{" "}
             (<span style={{textDecorationStyle: "dotted", textDecorationLine: "underline"}}>
-                {formatCurrency((amount as number) * currencies[outputCurrency][inputCurrency], outputCurrency)}
+                {convertCurrency(amount as number, inputCurrency, outputCurrency, true)}
             </span>)
             
             </Popover>

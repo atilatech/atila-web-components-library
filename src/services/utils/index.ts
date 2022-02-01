@@ -1,1 +1,1 @@
-export { formatCurrency } from "./TextUtils";
+export { formatCurrency, convertCurrency } from "./CurrencyUtils";

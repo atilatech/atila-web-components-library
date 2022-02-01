@@ -17,6 +17,12 @@ To run as a Bit server
 
 - `bit install`
 
+## Testing
+
+`yarn test`
+
+To test a specific file: `yarn test SomeTestFileToRun`, for example  `yarn test Currency`
+
 ## Adding a New Component
 
 - Summary of this tutorial: [Getting Started with Bit](https://harmony-docs.bit.dev/getting-started/creating-components)
@@ -38,6 +44,10 @@ To run as a Bit server
 
 - `bit compile`
 - `bit start`
+
+## Troubleshooting
+- If you're having issues with importing components in other components, try: `bit link` to 
+link your `node_modules` with your workspace
 
 ### Export the New Component (or updating an existing component)
 
