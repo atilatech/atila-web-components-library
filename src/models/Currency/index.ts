@@ -49,3 +49,22 @@ export const Currencies: {[key: string]: Currency} = {
     ETH: ETH,
     BNB: BNB,
 }
+
+export const CryptoCurrencies: {[key: string]: Currency} = {
+    ETH: ETH,
+    BNB: BNB,
+}
+
+export const FiatCurrencies: {[key: string]: Currency} = {
+    CAD: CAD,
+    USD: USD,
+    INR: INR,
+    NGN: NGN,
+}
+
+export const MAXIMUM_DECIMAL_PLACES = 8;
+/**
+ * Sometimes showing 8 decimal places is too many numbers in the UI.
+ * Show only fewer decimal places to keep the UI cleaner.
+ */
+export const MEDIUM_LENGTH_DECIMAL_PLACES = 4;

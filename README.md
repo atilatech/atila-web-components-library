@@ -51,6 +51,7 @@ link your `node_modules` with your workspace
 
 ### Export the New Component (or updating an existing component)
 
+- `bit status` to see what changes have been made
 - Tag the component you changed: `bit tag <component_id> --patch --message "first version"`
     - Use `bit list` to find your component ID
     - Example: `bit tag atila.web-components-library/ui/crypto-payment-form --patch --message "added support for binance and testnets"`

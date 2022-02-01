@@ -1,7 +1,7 @@
 import React from 'react'
 import { Popover } from 'antd';
-import { convertCurrency } from '@atila/web-components-library.utils';
-import { Currencies, Currency, ETH, USD } from '@atila/web-components-library.models.currency';
+import { convertCurrency, formatCurrency } from '@atila/web-components-library.utils';
+import { Currencies, Currency, CAD, USD } from '@atila/web-components-library.models.currency';
 
 interface CurrencyDisplayPropTypes {
     amount: string | number;
@@ -11,7 +11,7 @@ interface CurrencyDisplayPropTypes {
 };
 
 CurrencyDisplay.defaultProps = {
-    inputCurrency: ETH.code,
+    inputCurrency: CAD.code,
     outputCurrency: USD.code,
     currencies: Currencies,
 }
@@ -35,7 +35,7 @@ function CurrencyDisplay(props: CurrencyDisplayPropTypes) {
     return (
         <React.Fragment>
             <Popover content={content} title="Currencies">
-            {inputCurrency}{" "}{amount}{" "}
+            {formatCurrency(amount, inputCurrency)}{" "}
             (<span style={{textDecorationStyle: "dotted", textDecorationLine: "underline"}}>
                 {convertCurrency(amount as number, inputCurrency, outputCurrency, true)}
             </span>)
