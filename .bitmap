@@ -10,7 +10,7 @@
 
 {
     "models/currency": {
-        "scope": "",
+        "scope": "atila.web-components-library",
         "version": "0.0.1",
         "mainFile": "index.ts",
         "rootDir": "src/models/Currency"
@@ -23,13 +23,13 @@
     },
     "ui/currency-display": {
         "scope": "atila.web-components-library",
-        "version": "0.0.4",
+        "version": "0.0.5",
         "mainFile": "CurrencyDisplay.tsx",
         "rootDir": "src/components/CurrencyDisplay"
     },
     "utils": {
         "scope": "atila.web-components-library",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "mainFile": "index.ts",
         "rootDir": "src/services/utils"
     },

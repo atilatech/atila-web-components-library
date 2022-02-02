@@ -2,18 +2,30 @@
  * Remember to put each function you declare here into src/services/utils/index.ts
  */
 
-import { CryptoCurrencies, Currencies, MEDIUM_LENGTH_DECIMAL_PLACES } from "@atila/web-components-library.models.currency";
+import { CryptoCurrencies, Currencies, MAXIMUM_DECIMAL_PLACES, MEDIUM_LENGTH_DECIMAL_PLACES } from "@atila/web-components-library.models.currency";
 
 
 
 export function formatCurrency(input : number | string, currency = "CAD", convertToInteger=false) {
 
+    input = Number.parseFloat(input as string);
+
     const isCrypto = Object.keys(CryptoCurrencies).includes(currency);
 
-    if (convertToInteger) {
-        input = Number.parseInt(input as string);
+    let minimumFractionDigits = 2;
+    // only show if the number is a crypto and a decimal place or the value is less than 0.00
+    if(input !== 0) {
+        if((isCrypto && input %1 !== 0)|| input < 10e-2) {
+            minimumFractionDigits = MEDIUM_LENGTH_DECIMAL_PLACES;;
+        } if (input < 10e-4) {
+            minimumFractionDigits = MAXIMUM_DECIMAL_PLACES;
+        }
     }
-    return input.toLocaleString('en-ca', {style : 'currency', currency, minimumFractionDigits: isCrypto ? MEDIUM_LENGTH_DECIMAL_PLACES : 2 });
+
+    if (convertToInteger) {
+        input = Number.parseInt(input.toLocaleString());
+    }
+    return input.toLocaleString('en-ca', {style : 'currency', currency, minimumFractionDigits });
 }
 
 
