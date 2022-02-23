@@ -240,14 +240,16 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     disabled={!isEditableAmount}
                     onChange={updatePaymentForm}
                 />
+                <div className="w-100">
                 <Button
                     type="primary"
-                    className="col-12 my-4"
+                    className="center-block w-100 my-4"
                     onClick={startPayment}
                 >
                     Confirm Payment <br/>
                     {amount.toFixed(MAXIMUM_DECIMAL_PLACES)} {currency}
                 </Button>
+                </div>
 
                 {
                     transactionUrl &&
