@@ -11,6 +11,7 @@ function App() {
   }
   return (
     <div className="App container py-5">
+      <h1>Atila Web Components Library</h1>
     <CurrencyDisplay amount={0.01} />
     <hr/>
     <ConfigurableCryptoPaymentForm />
