@@ -11,7 +11,7 @@ declare global {
     }
 }
 
-export const CHAIN_IDS =  {
+export const CHAIN_NAMES =  {
     BINANCE: {
         NAME: "Binance",
         CURRENCY_CODE: "BNB",
@@ -99,11 +99,11 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
     let blockExplorerHost = "etherscan.io";
 
-    if (currency === CHAIN_IDS.BINANCE.CURRENCY_CODE) {
+    if (currency === CHAIN_NAMES.BINANCE.CURRENCY_CODE) {
         blockExplorerHost = "bscscan.com"
     }
     if (isTestNet) {
-        networkName = currency === CHAIN_IDS.BINANCE.CURRENCY_CODE ? CHAIN_IDS.BINANCE.TEST_NET.NAME : CHAIN_IDS.ETHEREUM.ROPSTEN.NAME;
+        networkName = currency === CHAIN_NAMES.BINANCE.CURRENCY_CODE ? CHAIN_NAMES.BINANCE.TEST_NET.NAME : CHAIN_NAMES.ETHEREUM.ROPSTEN.NAME;
         blockExplorerHost = `${networkName}.${blockExplorerHost}`
     } else {
         networkName = "mainnet"
@@ -123,24 +123,24 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     const checkCorrectNetwork = (network: Network) => {
         let expectedChainId;
 
-        if (currency === CHAIN_IDS.ETHEREUM.CURRENCY_CODE) {
+        if (currency === CHAIN_NAMES.ETHEREUM.CURRENCY_CODE) {
             if (isTestNet) {
-                expectedChainId = CHAIN_IDS.ETHEREUM.ROPSTEN.ID;
+                expectedChainId = CHAIN_NAMES.ETHEREUM.ROPSTEN.ID;
             } else {
-                expectedChainId = CHAIN_IDS.ETHEREUM.MAIN_NET.ID;
+                expectedChainId = CHAIN_NAMES.ETHEREUM.MAIN_NET.ID;
 
             }
-        } else if (currency === CHAIN_IDS.BINANCE.CURRENCY_CODE) {
+        } else if (currency === CHAIN_NAMES.BINANCE.CURRENCY_CODE) {
             if (isTestNet) {
-                expectedChainId = CHAIN_IDS.BINANCE.TEST_NET.ID;
+                expectedChainId = CHAIN_NAMES.BINANCE.TEST_NET.ID;
             } else {
-                expectedChainId = CHAIN_IDS.BINANCE.MAIN_NET.ID;
+                expectedChainId = CHAIN_NAMES.BINANCE.MAIN_NET.ID;
             }
         }
 
         if (network.chainId !== expectedChainId) {
-            const actualNetworkName = [CHAIN_IDS.BINANCE.TEST_NET.ID, CHAIN_IDS.ETHEREUM.ROPSTEN.ID].includes(network.chainId) ? "testnet" : "mainnet";
-            const actualCurrency = [CHAIN_IDS.BINANCE.MAIN_NET.ID, CHAIN_IDS.BINANCE.TEST_NET.ID].includes(network.chainId)? CHAIN_IDS.BINANCE.CURRENCY_CODE : CHAIN_IDS.ETHEREUM.CURRENCY_CODE;
+            const actualNetworkName = [CHAIN_NAMES.BINANCE.TEST_NET.ID, CHAIN_NAMES.ETHEREUM.ROPSTEN.ID].includes(network.chainId) ? "testnet" : "mainnet";
+            const actualCurrency = [CHAIN_NAMES.BINANCE.MAIN_NET.ID, CHAIN_NAMES.BINANCE.TEST_NET.ID].includes(network.chainId)? CHAIN_NAMES.BINANCE.CURRENCY_CODE : CHAIN_NAMES.ETHEREUM.CURRENCY_CODE;
             return {isCorrectNetwork: false, message: `Change your network in Metamask. Expected "${isTestNet ? "testnet" : "mainnet"}" network (${networkName}) for currency: ${currency}.
              Instead received "${actualNetworkName}" network (${network.name}) for currency: ${actualCurrency}.`}
         }
