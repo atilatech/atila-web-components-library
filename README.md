@@ -4,6 +4,8 @@ A library of components used to build the Atila website
 
 You can view the components at: https://bit.dev/atila/web-components-library
 
+For an example of what we're trying to build, see [ethereum-boilerplate/ethereum-boilerplate](https://github.com/ethereum-boilerplate/ethereum-boilerplate)
+
 ## Quickstart
 
 This project can either be run as a React web server or a [Bit](https://bit.dev/) Server

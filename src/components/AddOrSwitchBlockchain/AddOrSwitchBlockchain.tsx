@@ -1,67 +1,42 @@
-import React from 'react'
-// TODO find a way to update CHAIN_IDS import
-// import { CHAIN_IDS } from '@atila/web-components-library.models.currency';
-import { Button } from 'antd'
+import React, { useState } from 'react';
+import { Alert, Button, Spin } from 'antd'
+import { BlockChain, CHAIN_IDS } from '@atila/web-components-library.models.currency';
 
-export interface AddOrSwitchBlockchainProps {
+// https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
+declare global {
+  interface Window {
+      ethereum:any;
+  }
+}
+
+export interface AddOrSwitchBlockChainProps {
     chainId: number;
+    showAddBlockChain: boolean;
+    showSwitchBlockChain: boolean;
 }
 
-export interface BlockChain {
-    currencyCode: string,
-    currencyName: string,
-    chainId: number,
-    networkName: string,
-    isMainNet: boolean,
-    blockExplorerUrl: string;
-    rpcUrl: string;
+AddOrSwitchBlockChain.defaultProps = {
+  showAddBlockChain: true,
+  showSwitchBlockChain: false
 }
 
-/**
- * Use a key CHAIN_ID_{ID} instead of just the numerical ID so that CHAIN_IDS doesn't get converted to numerical index
- */
- export const CHAIN_IDS: { [id: string] : BlockChain; } = {
-    CHAIN_ID_1: {
-        currencyCode: "ETH",
-        currencyName: "Ethereum",
-        chainId: 1,
-        networkName: "Ethereum Mainnet",
-        isMainNet: true,
-        blockExplorerUrl: "https://etherscan.io",
-        rpcUrl: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
-    },
-    CHAIN_ID_3: {
-        currencyCode: "ETH",
-        currencyName: "Ethereum",
-        chainId: 3,
-        networkName: "Ethereum Ropsten",
-        isMainNet: false,
-        blockExplorerUrl: "https://ropsten.etherscan.io",
-        rpcUrl: "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
-    },
-    CHAIN_ID_56: {
-        currencyCode: "BNB",
-        currencyName: "Binance Coin",
-        chainId: 56,
-        networkName: "Binance Smart Chain",
-        isMainNet: true,
-        blockExplorerUrl: "https://bscscan.com",
-        rpcUrl: "https://bsc-dataseed.binance.org/",
-    },
-    CHAIN_ID_97: {
-        currencyCode: "BNB",
-        currencyName: "Binance Coin",
-        chainId: 97,
-        networkName: "Binance Smart Chain Testnet",
-        isMainNet: false,
-        blockExplorerUrl: "https://testnet.bscscan.com",
-        rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-    }
-}
+function AddOrSwitchBlockChain(props: AddOrSwitchBlockChainProps) {
 
-function AddOrSwitchBlockchain(props: AddOrSwitchBlockchainProps) {
+  const { chainId, showAddBlockChain, showSwitchBlockChain } = props;
 
-  const { chainId } = props;
+  const provider = window.ethereum;
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isPending, setIsPending] = useState("");
+
+
+  if(!provider){
+    return <Alert 
+      className="my-2" 
+      message="Crypto wallet is not installed, please install one. E.g. Metamask"
+      type="error" />;
+  }
 
   const chainIdKey = `CHAIN_ID_${chainId}`;
 
@@ -69,33 +44,37 @@ function AddOrSwitchBlockchain(props: AddOrSwitchBlockchainProps) {
 
   const targetBlockChain: BlockChain = CHAIN_IDS[chainIdKey];
 
-  const changeBlockchain = async () => {
-    const provider = window.ethereum;
-    if(!provider){
-    console.log("Crypto wallet is not installed, please install!");
-    }
+  const switchBlockChain = async () => {
+
+    setErrorMessage("");
+    
+    setIsPending("Switching blockchain");
     try {
         await provider.request({
           method: 'wallet_switchEthereumChain',
          //  Convert numerical chain ID to hexadecimal string
           params: [{ chainId: chainIdHex}],
         });
-      console.log("You have succefully switched to Binance Test network")
-      } catch (switchError: any) {
-        // This error code indicates that the chain has not been added to MetaMask.
-        if (switchError.code === 4902) {
-         console.log("This network is not available in your metamask, please add it");
-         addBlockchain();
+        setSuccessMessage(`Switched to ${targetBlockChain.networkName}`);
+    } catch (error: any) {
+        if (error.code === 4902) {
+          console.log({error})
+          // This error code indicates that the chain has not been added to MetaMask.
+          setErrorMessage("This network is not available in your crypto wallet, please add it");
+          addBlockChain();
+        } else {
+          setErrorMessage(error.message);
         }
-        console.log("Failed to switch to the network")
-      }
+    }
+    setIsPending("");
+
   }
 
-
-
-  const addBlockchain = async () => {
+  const addBlockChain = async () => {
     const provider = window.ethereum;
+    setErrorMessage("");
 
+    setIsPending("Adding blockchain");
     try {
         await provider.request({
           method: 'wallet_addEthereumChain',
@@ -108,18 +87,50 @@ function AddOrSwitchBlockchain(props: AddOrSwitchBlockchainProps) {
             decimals: 18
             } }]}
         );
-      } catch (addError) {
-         console.log(addError);
+        setSuccessMessage(`Added ${targetBlockChain.networkName}`);
+      } 
+      catch (error: any) {
+        console.log({error});
+        setErrorMessage(error.message);
+      }
+
+    setIsPending("");
   }
+
+
+  const AddOrSwitchButton = ({isAddMode, onClick}: {isAddMode: boolean, onClick: ()=> {}}) => {
+
+    return (
+      <Button onClick={onClick}>
+        <div>
+          <span>
+            {isAddMode ? "Add " : "Switch to "} {targetBlockChain.networkName}{' '}
+          </span>
+          <img src={targetBlockChain.logo} width="auto" height="25px" className="pb-1"/>
+        </div>
+      </Button>
+    )
   }
 
   return (
     <div>
-        <Button type="primary" onClick={changeBlockchain}>
-            Switch to {targetBlockChain.networkName}
-        </Button>
+      <Spin spinning={!!isPending} tip={isPending}>
+
+        {showAddBlockChain && 
+          <AddOrSwitchButton isAddMode={true} onClick={addBlockChain} />
+        }
+        {showSwitchBlockChain && 
+          <AddOrSwitchButton isAddMode={false} onClick={switchBlockChain} />
+        }
+        {errorMessage &&
+          <Alert className="my-2" message={errorMessage} type="error" />
+        }
+        {successMessage &&
+          <Alert className="my-2" message={successMessage} type="success" />
+        }
+      </Spin>
     </div>
   )
 }
 
-export default AddOrSwitchBlockchain
+export default AddOrSwitchBlockChain
