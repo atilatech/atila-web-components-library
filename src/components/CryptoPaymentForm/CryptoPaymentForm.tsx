@@ -13,31 +13,6 @@ declare global {
     }
 }
 
-export const CHAIN_NAMES =  {
-    BINANCE: {
-        NAME: "Binance",
-        CURRENCY_CODE: "BNB",
-        MAIN_NET: {
-            ID: 56
-        },
-        TEST_NET: {
-            NAME: "testnet",
-            ID: 97,
-        }
-    },
-    ETHEREUM: {
-        NAME: "Ethereum",
-        CURRENCY_CODE: "ETH",
-        MAIN_NET: {
-            ID: 1
-        },
-        ROPSTEN: {
-            NAME: "ropsten",
-            ID: 3
-        }
-    }
-}
-
 export const MAXIMUM_DECIMAL_PLACES = 8;
 
 export const CRYPTO_IN_USD: any = {
@@ -57,7 +32,6 @@ interface CryptoPaymentFormPropTypes {
     amount: number;
     destinationAddress: string;
     isTestNet: boolean;
-    networkName: string;
     title: string;
     currency: string;
     /** Controls if the amount can be edited. */
@@ -72,7 +46,6 @@ interface CryptoPaymentFormPropTypes {
 CryptoPaymentForm.defaultProps = {
     destinationAddress: "0x38103603fEB199fba32be9b3A464877f28e659A7", //atilatech.eth
     isTestNet: true,
-    networkName: "",
     title: "",
     currency: "ETH",
     isEditableAmount: false,
@@ -89,7 +62,6 @@ CryptoPaymentForm.defaultProps = {
 function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
 
     const { onError, onSuccess, isEditableAmount, isEditableDestinationAddress, className, style, title, currency } = props;
-    let { networkName } = props;
 
     const [error, setError] = useState("");
     const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
@@ -101,18 +73,6 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     
 
     const targetBlockChain = findBlockChain(currency, !isTestNet);
-
-    let blockExplorerHost = "etherscan.io";
-
-    if (currency === CHAIN_NAMES.BINANCE.CURRENCY_CODE) {
-        blockExplorerHost = "bscscan.com"
-    }
-    if (isTestNet) {
-        networkName = currency === CHAIN_NAMES.BINANCE.CURRENCY_CODE ? CHAIN_NAMES.BINANCE.TEST_NET.NAME : CHAIN_NAMES.ETHEREUM.ROPSTEN.NAME;
-        blockExplorerHost = `${networkName}.${blockExplorerHost}`
-    } else {
-        networkName = "mainnet"
-    }
 
     const transactionUrl = transaction?.hash ? `${targetBlockChain?.blockExplorerUrl}/tx/${transaction.hash}` : "";
 
