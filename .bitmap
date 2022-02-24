@@ -16,14 +16,14 @@
         "rootDir": "src/models/Currency"
     },
     "ui/add-or-switch-blockchain": {
-        "scope": "",
-        "version": "0.0.2",
+        "scope": "atila.web-components-library",
+        "version": "0.0.3",
         "mainFile": "AddOrSwitchBlockchain.tsx",
         "rootDir": "src/components/AddOrSwitchBlockchain"
     },
     "ui/crypto-payment-form": {
         "scope": "atila.web-components-library",
-        "version": "0.0.8",
+        "version": "0.0.11",
         "mainFile": "CryptoPaymentForm.tsx",
         "rootDir": "src/components/CryptoPaymentForm"
     },

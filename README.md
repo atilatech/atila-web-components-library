@@ -29,7 +29,9 @@ To test a specific file: `yarn test SomeTestFileToRun`, for example  `yarn test 
 
 - Summary of this tutorial: [Getting Started with Bit](https://harmony-docs.bit.dev/getting-started/creating-components)
 
-- Create a tsx folder and file for the component: `src/components/MyComponent/MyComponent.tsx`
+- Create a tsx folder and file for the component: `src/components/MyComponent/MyComponent.tsx` or `src/components/MyComponent/index.tsx`
+    - If you want to use your component in other components in the project, you might have to create a seperate file called `index.ts` that exports the components created in `MyComponent.tsx`
+        - For example, see: `src/components/AddOrSwitchBlockchain/index.ts` and `src/components/AddOrSwitchBlockchain/AddOrSwitchBlockchain.tsx`
 - Create a compositions file `src/components/MyComponent/MyComponent.compositions.tsx`
 - Make sure to import stylesheets into the compostions file
     - Note: We're looking into a way to automatically import the stylesheets in all compositions

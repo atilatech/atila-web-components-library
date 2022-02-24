@@ -24,7 +24,7 @@ const currencyOptions = [
     },
     {
         name: CHAIN_IDS.CHAIN_ID_56.currencyName,
-        value: CHAIN_IDS.CHAIN_ID_56.currencyName,
+        value: CHAIN_IDS.CHAIN_ID_56.currencyCode,
     }
 ]
 

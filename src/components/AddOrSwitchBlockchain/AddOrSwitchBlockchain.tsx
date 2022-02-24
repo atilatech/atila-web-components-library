@@ -22,7 +22,7 @@ AddOrSwitchBlockChain.defaultProps = {
   showSwitchBlockChain: false
 }
 
-function AddOrSwitchBlockChain(props: AddOrSwitchBlockChainProps) {
+export function AddOrSwitchBlockChain(props: AddOrSwitchBlockChainProps) {
 
   const { chainId, showAddBlockChain, showSwitchBlockChain, onAddComplete, onSwitchComplete } = props;
 
@@ -140,5 +140,3 @@ function AddOrSwitchBlockChain(props: AddOrSwitchBlockChainProps) {
     </div>
   )
 }
-
-export default AddOrSwitchBlockChain

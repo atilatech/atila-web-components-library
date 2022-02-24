@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { Network } from '@ethersproject/networks';
 import "./CryptoPaymentForm.css";
 import { CHAIN_IDS, findBlockChain } from '@atila/web-components-library.models.currency';
-import AddOrSwitchBlockChain from '@atila/web-components-library.ui.add-or-switch-blockchain';
+import { AddOrSwitchBlockChain } from '@atila/web-components-library.ui.add-or-switch-blockchain';
 
 // https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
 declare global {
