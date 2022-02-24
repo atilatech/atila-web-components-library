@@ -127,3 +127,12 @@ export interface BlockChain {
         logo: binanceLogo,
     }
 }
+
+export const findBlockChain = (currency: string, isMainNet: boolean) => {
+
+    for (const blockChain of Object.values(CHAIN_IDS)) {
+        if (currency === blockChain.currencyCode && isMainNet === blockChain.isMainNet) {
+            return blockChain
+        }
+    }
+}

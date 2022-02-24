@@ -13,6 +13,8 @@ export interface AddOrSwitchBlockChainProps {
     chainId: number;
     showAddBlockChain: boolean;
     showSwitchBlockChain: boolean;
+    onAddComplete?: (newBlockchain: BlockChain) => void;
+    onSwitchComplete?: (newBlockchain: BlockChain) => void;
 }
 
 AddOrSwitchBlockChain.defaultProps = {
@@ -22,7 +24,7 @@ AddOrSwitchBlockChain.defaultProps = {
 
 function AddOrSwitchBlockChain(props: AddOrSwitchBlockChainProps) {
 
-  const { chainId, showAddBlockChain, showSwitchBlockChain } = props;
+  const { chainId, showAddBlockChain, showSwitchBlockChain, onAddComplete, onSwitchComplete } = props;
 
   const provider = window.ethereum;
 
@@ -56,6 +58,9 @@ function AddOrSwitchBlockChain(props: AddOrSwitchBlockChainProps) {
           params: [{ chainId: chainIdHex}],
         });
         setSuccessMessage(`Switched to ${targetBlockChain.networkName}`);
+        if (onSwitchComplete) {
+          onSwitchComplete(targetBlockChain)
+        }
     } catch (error: any) {
         if (error.code === 4902) {
           console.log({error})
@@ -88,6 +93,9 @@ function AddOrSwitchBlockChain(props: AddOrSwitchBlockChainProps) {
             } }]}
         );
         setSuccessMessage(`Added ${targetBlockChain.networkName}`);
+        if (onAddComplete) {
+          onAddComplete(targetBlockChain)
+        }
       } 
       catch (error: any) {
         console.log({error});

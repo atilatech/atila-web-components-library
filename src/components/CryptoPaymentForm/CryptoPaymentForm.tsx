@@ -3,6 +3,8 @@ import { Alert, Button } from 'antd';
 import { ethers } from 'ethers';
 import { Network } from '@ethersproject/networks';
 import "./CryptoPaymentForm.css";
+import { CHAIN_IDS, findBlockChain } from '@atila/web-components-library.models.currency';
+import AddOrSwitchBlockChain from '@atila/web-components-library.ui.add-or-switch-blockchain';
 
 // https://stackoverflow.com/questions/12709074/how-do-you-explicitly-set-a-new-property-on-window-in-typescript
 declare global {
@@ -93,9 +95,12 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
     const [transaction, setTransaction] = useState<TransactionResponsePayment | null >(null);
     const [amount, setAmount] = useState(props.amount);
     const [destinationAddress, setDestinationAddress] = useState(props.destinationAddress);
-    const [isTestNet, setIsTestNet] = useState(props.isTestNet)
+    const [isTestNet, setIsTestNet] = useState(props.isTestNet);
+    const [isCorrectNetwork, setIsCorrectNetwork] = useState(true);
 
     
+
+    const targetBlockChain = findBlockChain(currency, !isTestNet);
 
     let blockExplorerHost = "etherscan.io";
 
@@ -109,10 +114,10 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
         networkName = "mainnet"
     }
 
-    const transactionUrl = transaction?.hash ? `https://${blockExplorerHost}/tx/${transaction.hash}` : "";
+    const transactionUrl = transaction?.hash ? `${targetBlockChain?.blockExplorerUrl}/tx/${transaction.hash}` : "";
 
     // Note: This destination address does not distinguish between if the mainnet or Test (e.g. Ropsten) network is being used
-    let destinationAddressUrl = `https://${blockExplorerHost}/address/${destinationAddress}`;
+    let destinationAddressUrl = `${targetBlockChain?.blockExplorerUrl}/address/${destinationAddress}`;
 
     /**
      * Check that the selected network in the browser matches the network in the user's settings.
@@ -121,29 +126,14 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
      * @returns 
      */
     const checkCorrectNetwork = (network: Network) => {
-        let expectedChainId;
+        const actualBlockChain = CHAIN_IDS[`CHAIN_ID_${network.chainId}`];
 
-        if (currency === CHAIN_NAMES.ETHEREUM.CURRENCY_CODE) {
-            if (isTestNet) {
-                expectedChainId = CHAIN_NAMES.ETHEREUM.ROPSTEN.ID;
-            } else {
-                expectedChainId = CHAIN_NAMES.ETHEREUM.MAIN_NET.ID;
-
-            }
-        } else if (currency === CHAIN_NAMES.BINANCE.CURRENCY_CODE) {
-            if (isTestNet) {
-                expectedChainId = CHAIN_NAMES.BINANCE.TEST_NET.ID;
-            } else {
-                expectedChainId = CHAIN_NAMES.BINANCE.MAIN_NET.ID;
-            }
+        if (actualBlockChain.chainId !== targetBlockChain?.chainId) {
+            setIsCorrectNetwork(false);
+            return { isCorrectNetwork: false,
+                 message: `Change your network in your crypto wallet. Expected ${targetBlockChain?.networkName} but received ${actualBlockChain.networkName}.`}
         }
-
-        if (network.chainId !== expectedChainId) {
-            const actualNetworkName = [CHAIN_NAMES.BINANCE.TEST_NET.ID, CHAIN_NAMES.ETHEREUM.ROPSTEN.ID].includes(network.chainId) ? "testnet" : "mainnet";
-            const actualCurrency = [CHAIN_NAMES.BINANCE.MAIN_NET.ID, CHAIN_NAMES.BINANCE.TEST_NET.ID].includes(network.chainId)? CHAIN_NAMES.BINANCE.CURRENCY_CODE : CHAIN_NAMES.ETHEREUM.CURRENCY_CODE;
-            return {isCorrectNetwork: false, message: `Change your network in Metamask. Expected "${isTestNet ? "testnet" : "mainnet"}" network (${networkName}) for currency: ${currency}.
-             Instead received "${actualNetworkName}" network (${network.name}) for currency: ${actualCurrency}.`}
-        }
+        setIsCorrectNetwork(true);
         return { isCorrectNetwork: true, message: "" }
     }
     
@@ -243,7 +233,7 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                 <div className="w-100">
                 <Button
                     type="primary"
-                    className="center-block w-100 my-4"
+                    className="center-block w-100 mt-4"
                     onClick={startPayment}
                 >
                     Confirm Payment <br/>
@@ -255,19 +245,39 @@ function CryptoPaymentForm(props: CryptoPaymentFormPropTypes) {
                     transactionUrl &&
                     <Alert
                         type="success"
-                        message={<p className="my-2"> 
+                        className="mt-4"
+                        message={<div> 
                         Payment Complete: <a href={transactionUrl} target="_blank" rel="noopener noreferrer">
                         View Transaction
                         </a>
-                    </p>}
+                    </div>}
                     />
                     
                 }
                 {error && 
                 <Alert
                     type="error"
+                    className="mt-4"
                     message={error}
                 />
+                }
+
+                {!targetBlockChain && 
+                    <Alert
+                        className="mt-4"
+                        type="error"
+                        message={`No matching blockchain network found for ${currency} ${isTestNet ? "in testnet" : "in mainnet"}.`}
+                    />
+                }
+                {!isCorrectNetwork && targetBlockChain &&
+                    <div className="mt-4">
+                        <AddOrSwitchBlockChain 
+                        chainId={targetBlockChain.chainId} 
+                        showSwitchBlockChain={true} 
+                        showAddBlockChain={false} 
+                        onSwitchComplete={() => setError("")}
+                        onAddComplete={() => setError("")} />
+                    </div>
                 }
             </div>
         </div>
