@@ -1,3 +1,5 @@
+import ethereumLogo from './assets/ethereumLogo.png';
+import binanceLogo from './assets/binanceLogo.png';
 
 export class Currency {
     code: string = "";
@@ -68,3 +70,69 @@ export const MAXIMUM_DECIMAL_PLACES = 8;
  * Show only fewer decimal places to keep the UI cleaner.
  */
 export const MEDIUM_LENGTH_DECIMAL_PLACES = 4;
+
+export interface BlockChain {
+    currencyCode: string,
+    currencyName: string,
+    chainId: number,
+    networkName: string,
+    isMainNet: boolean,
+    blockExplorerUrl: string;
+    rpcUrl: string;
+    logo: string;
+}
+
+/**
+ * Use a key CHAIN_ID_{ID} instead of just the numerical ID so that CHAIN_IDS doesn't get converted to numerical index
+ */
+ export const CHAIN_IDS: { [id: string] : BlockChain; } = {
+    CHAIN_ID_1: {
+        currencyCode: "ETH",
+        currencyName: "Ethereum",
+        chainId: 1,
+        networkName: "Ethereum Mainnet",
+        isMainNet: true,
+        blockExplorerUrl: "https://etherscan.io",
+        rpcUrl: "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+        logo: ethereumLogo,
+    },
+    CHAIN_ID_3: {
+        currencyCode: "ETH",
+        currencyName: "Ethereum",
+        chainId: 3,
+        networkName: "Ethereum Ropsten",
+        isMainNet: false,
+        blockExplorerUrl: "https://ropsten.etherscan.io",
+        rpcUrl: "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+        logo: ethereumLogo,
+    },
+    CHAIN_ID_56: {
+        currencyCode: "BNB",
+        currencyName: "Binance Coin",
+        chainId: 56,
+        networkName: "Binance Smart Chain",
+        isMainNet: true,
+        blockExplorerUrl: "https://bscscan.com",
+        rpcUrl: "https://bsc-dataseed.binance.org/",
+        logo: binanceLogo,
+    },
+    CHAIN_ID_97: {
+        currencyCode: "BNB",
+        currencyName: "Binance Coin",
+        chainId: 97,
+        networkName: "Binance Smart Chain Testnet",
+        isMainNet: false,
+        blockExplorerUrl: "https://testnet.bscscan.com",
+        rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+        logo: binanceLogo,
+    }
+}
+
+export const findBlockChain = (currency: string, isMainNet: boolean) => {
+
+    for (const blockChain of Object.values(CHAIN_IDS)) {
+        if (currency === blockChain.currencyCode && isMainNet === blockChain.isMainNet) {
+            return blockChain
+        }
+    }
+}

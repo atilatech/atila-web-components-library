@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import CryptoPaymentForm, { CHAIN_IDS, CRYPTO_IN_USD, MAXIMUM_DECIMAL_PLACES } from './CryptoPaymentForm';
+import CryptoPaymentForm, { CRYPTO_IN_USD, MAXIMUM_DECIMAL_PLACES } from './CryptoPaymentForm';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'antd/dist/antd.css';
 import { Radio, Select } from 'antd';
+import { CHAIN_IDS } from '@atila/web-components-library.models.currency';
 
 const { Option } = Select;
 
@@ -18,12 +19,12 @@ const paymentAmountOptions = [
 
 const currencyOptions = [
     {
-        name: CHAIN_IDS.ETHEREUM.NAME,
-        value: CHAIN_IDS.ETHEREUM.CURRENCY_CODE,
+        name: CHAIN_IDS.CHAIN_ID_1.currencyName,
+        value: CHAIN_IDS.CHAIN_ID_1.currencyCode,
     },
     {
-        name: CHAIN_IDS.BINANCE.NAME,
-        value: CHAIN_IDS.BINANCE.CURRENCY_CODE,
+        name: CHAIN_IDS.CHAIN_ID_56.currencyName,
+        value: CHAIN_IDS.CHAIN_ID_56.currencyCode,
     }
 ]
 
