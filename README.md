@@ -19,6 +19,13 @@ To run as a Bit server
 
 - `bit install`
 
+## Using in Other Projects
+
+- Configure `@atila` as a scoped repository: `npm config set '@atila:registry' https://node.bit.dev`
+- Install component: For example, `npm i @atila/web-components-library.ui.crypto-payment-form`
+
+![Example of using web-components-library](https://i.imgur.com/cusLOEK.png)
+
 ## Testing
 
 `yarn test`
