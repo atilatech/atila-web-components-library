@@ -23,7 +23,7 @@ export function formatCurrency(input : number | string, currency = "CAD", conver
     }
 
     if (convertToInteger) {
-        input = Number.parseInt(input.toLocaleString());
+        input = Number.isFinite(input) ? Math.trunc(input) : NaN;
     }
     return input.toLocaleString('en-ca', {style : 'currency', currency, minimumFractionDigits });
 }
